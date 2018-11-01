@@ -1,0 +1,43 @@
+Final Project
+GES 772
+Geospatial Web Services and Interoperability
+UMBC - Fall 2018
+Dr. Luis Bermudez - bermud@umbc.edu
+Description
+The final project consists of developing a geospatial Web-based application.
+Examples:
+• Support tourist providing points of interest in New York
+• Flood risk web application
+Final project is 28% if final grade
+Teams and roles
+The students will form teams of 2-3 students. A team will work through the elements of researching,
+proposing, designing, and implementing the application.
+It is expected that each student will have worked at least 40 hours on the project itself over the course of
+4+ weeks. The instructor will be available to provide further guidance on the right scoping of specific
+proposed projects.
+Data source
+For the source of data, students will use services found on the Web, including those used in labs
+exercises. Students are required to setup their own services and a client.
+Requirements (total 10 points)
+• Designing of the system using Viewpoints (2 points).
+• The students will provide at least one of those source via a web service (2 points).
+• The students will develop a client application that:
+• displays data from 3 sources of data via web services. One should be vector data (3
+points).
+• provides a faceted search with at least three different facets based on properties of the
+vector data (2 points)
+• provides and an event mouse functionality (1 points).
+Proposal
+• Provides the view points
+• identifies sources of data and which ones will be hosted
+• identifies the event mouse functionality interaction
+• identifies the faceted search categories
+Dates
+Class Date Status
+Class 7 Oct 29 Introduction
+Class 8 Nov 5 Proposal with Viewpoints
+Class 9 Nov 12 Project Update
+Class 10 Nov 19 Project Update
+Class 11 Nov 26 Project Clinic (in time class to work on the project)
+Class 12 Dec 3 Project Clinic (in time class to work on the project)
+Class 13 Dec 10 Presentations and Reports (Virtual)
