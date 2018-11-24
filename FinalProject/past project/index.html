@@ -1,0 +1,281 @@
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Where's that Crime!</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+<!-- Link Leaflet from CDN-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/leaflet/1.0.0-beta.2/leaflet.css" />
+
+<!--Load Leaflet 1.0.0 for ESRI-Leaflet-->
+<script src="https://cdn.jsdelivr.net/leaflet/1.0.0-beta.2/leaflet.js"></script>
+
+<!-- Load Esri Leaflet from CDN -->
+<script src="https://cdn.jsdelivr.net/leaflet.esri/2.0.0-beta.8/esri-leaflet.js"></script>
+
+<!-- Load KNN scripts from local directory -->
+<script src='leaflet-knn.js'></script>
+    
+<!-- Scripts for Data-->
+<!-- LeafletLayer JSON to pull only JSONs -->
+<script src="https://rawgit.com/stefanocudini/leaflet-layerJSON/master/dist/leaflet-layerjson.src.js"></script>
+
+<!-- Ajax for Pulling GeoJSON -->
+<script src="https://rawgit.com/calvinmetcalf/leaflet-ajax/gh-pages/dist/leaflet.ajax.js"></script>
+<!-- JQuery for getting the crime data for a particular area -->
+<script src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+<!-- Load Active Listings -->
+<script src="https://rawgit.com/pq1/772-Final/master/active.js"></script>
+
+<!-- End Scripts for Data --> 
+<style>
+body { margin:0; padding:0; }
+#map { position: absolute; top:0; bottom:0; right:0; left:0; }
+    
+.legend {
+ text-align: left;
+ line-height: 18px;
+ color: #555;
+ background-color: white;
+ padding:2;
+ }
+ .legend i {
+ width: 18px;
+ height: 18px;
+ float: left;
+ margin-right: 8px;
+ opacity: 0.7;
+}
+ 
+</style>
+
+</head>
+<body>
+
+<div id="map" style="width: 960px; height: 500px"></div>
+
+<script>
+var map = L.map('map').setView([39.187, -77.135], 10);
+
+// ESRI Grayscale Baselayer
+var esriGray = L.esri.basemapLayer('Gray',{maxZoom: 17,
+minZoom: 1});
+
+// Open Streetmap Baselayer
+var OpenStreetMap = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+//Houses in School Districts with Rating > 8
+ var schoolDistrictHouses ="https://rawgit.com/pq1/772-Final/master/housesSchoolDistricts.geojson";
+
+// Declare Icons // // NEW is needed for icon to show up //
+// Blue House
+var blueHouse = new L.Icon({iconUrl: 'https://raw.githubusercontent.com/pq1/772-Final/master/bluehouse.png',
+iconSize: [20,20]});
+
+// Brown House
+var brownHouse = new L.Icon({iconUrl: 'https://raw.githubusercontent.com/pq1/772-Final/master/brownhouse.png',
+iconSize: [20,20]});
+
+// Red House
+var redHouse = new L.Icon({iconUrl: 'https://raw.githubusercontent.com/pq1/772-Final/master/redhouse.png',
+iconSize: [20,20]});
+    
+// Black House
+var blackHouse = new L.Icon({iconUrl: 'https://raw.githubusercontent.com/pq1/772-Final/master/blackhouse.png',
+iconSize: [20,20]});
+
+// The marker for where clicked
+var clickIcon = new L.Icon({iconUrl: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|abcdef&chf=a,s,ee00FFFF',
+iconSize: [30,30]});
+
+    
+// The marker for the crime instances
+var crimeIcon = new L.Icon({iconUrl: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|e85141&chf=a,s,ee00FFFF',
+iconSize: [20,20]});
+
+    
+// End Icons //
+// this fires everytime the map is clicked.
+
+map.on('click', function(e) {
+    var nearestHouses = leafletKnn(houses34).nearestLayer(e.latlng, 5, 2000);
+    alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng + "--" + nearestHouses);
+    L.marker([e.latlng.lat, e.latlng.lng], {icon: clickIcon}).addTo(map);
+//   $.getJSON("https://data.montgomerycountymd.gov/resource/yc8a-5df8.geojson?$where=within_circle(geolocation, 39.200, -77.100,1000)", function(data) { addDataToMap(data, map); });
+$.getJSON("https://data.montgomerycountymd.gov/resource/yc8a-5df8.geojson?$where=within_circle(geolocation," + e.latlng.lat.toString() + "," + e.latlng.lng.toString() + ",1000)", function(data) { addCrimeDataToMap(data, map); });
+alert(nearestHouses[0].readAsText);
+//L.marker([39.2217, -77.2803], {icon: blackHouse}).addTo(map);
+//L.marker([nearestHouses[0].lat , nearestHouses[0].lon], {icon: blackHouse}).addTo(map);
+//var nearHouseLayer = L.geoJson(nearestHouses, onEachFeature: function(feature, layer) {
+var popupText = "Address: " + feature.properties.Address + "<br>" + "List Price: " + feature.properties.ListPrice + "<br>" + "Year Built: " + feature.properties.YearBuilt;
+layer.bindPopup(popupText);
+layer.setIcon(blackHouse);});
+//nearHouseLayer.addTo(map);
+
+function addCrimeDataToMap(data, map) {
+    var dataLayer = L.geoJson(data, {
+        onEachFeature: function(feature, layer) {
+            var popupText = "Incident: " + feature.properties.narrative
+                + "<br>Date and Time: " + feature.properties.start_date;
+            layer.bindPopup(popupText);
+            layer.setIcon(crimeIcon);}
+        });    
+    dataLayer.addTo(map);
+    map.fitBounds(dataLayer);
+  //  var nearestHouses = leafletKnn(active).nearest(e.latlng.lat.toString(), e.latlng.lng.toString(), 5);
+   // L.marker([nearestHouses[0].lat , nearestHouses[0].lon], {icon: blackHouse}).addTo(map);
+}
+
+function addHouseDataToMap(data, map) {
+    var dataLayer = L.geoJson(data, {
+        onEachFeature: function(feature, layer) {
+            var popupText = "Address: " + feature.properties.Address + "<br>" + "List Price: " + feature.properties.ListPrice + "<br>" + "Year Built: " + feature.properties.YearBuilt;
+            layer.bindPopup(popupText);
+            layer.setIcon(blackHouse);}
+        });    
+    dataLayer.addTo(map);
+    map.fitBounds(dataLayer);
+}
+
+//** Declare Popups and Icons Functions **//
+// Bluehouse
+function popupBlue (feature, layer){
+layer.bindPopup("Address: " + feature.properties.Address + "<br>" + "List Price: " + feature.properties.ListPrice + "<br>" + "Year Built: " + feature.properties.YearBuilt);
+layer.setIcon(blueHouse);
+//$.getJSON("https://data.montgomerycountymd.gov/resource/yc8a-5df8.geojson?$where=within_circle(geolocation, 39.200, -77.100,1000)", function(data) { addDataToMap(data, map); });
+$.getJSON("https://data.montgomerycountymd.gov/resource/yc8a-5df8.geojson?$where=within_circle(geolocation," + feature.properties.Latitude + "," + feature.properties.Longetude + ",1000)", function(data) { addDataToMap(data, map); });
+};
+
+// Brownhouse
+function popupBrown (feature, layer){
+layer.bindPopup("Address: " + feature.properties.Address + "<br>" + "List Price: " + feature.properties.ListPrice + "<br>" + "Year Built: " + feature.properties.YearBuilt);
+layer.setIcon(brownHouse);
+};
+
+// Redhouse
+function popupRed (feature, layer){
+layer.bindPopup("Address: " + feature.properties.Address + "<br>" + "List Price: " + feature.properties.ListPrice + "<br>" + "Year Built: " + feature.properties.YearBuilt);
+layer.setIcon(redHouse);
+    
+};
+
+//School Disticts Popup
+function schoolPop(feature, layer){
+{layer.bindPopup( "<strong>" + feature.properties.NAME + "</strong><br/>" + feature.properties.RATING + " Rating of school" )}}
+// End Popups and Icons Functions
+
+//** Color Schemes **//
+// Legend
+function getColor(d) {
+        return d > 9 ? '#a6611a' :
+               d > 8 ? '#dfc27d' :
+               d > 7 ? '#f5f5f5' :
+               d > 6 ? '#80cdc1' :
+               d > 5 ? '#018571' :
+                     '#FFEDA0';
+}
+
+// School District Ratings colors
+function schoolColor(feature){ var fillColor, rating = feature.properties.RATING;
+ if ( rating >= 9 ) fillColor = "#a6611a";
+ else if ( rating >= 8) fillColor = "#dfc27d";
+ else if ( rating >= 7 ) fillColor = "#f5f5f5";
+ else if ( rating >= 6 ) fillColor = "#80cdc1";
+ else if ( rating >= 6 ) fillColor = "#80cdc1";
+ else if ( rating >= 5 ) fillColor = "#018571";
+ else fillColor = "#f7f7f7";  // no data
+ return { color: "#999", weight: 1, fillColor: fillColor, fillOpacity: .6 };
+}
+//** End Color Schemes **//
+
+// Loading GeoJSON files //
+// Filtering Active GeoJSON
+// 300-400 Active Houses
+var houses34= new L.GeoJSON.AJAX(schoolDistrictHouses,
+{onEachFeature: popupBlue,
+filter: function(feature, layer){return feature.properties.ListPrice < 400000;}
+});
+
+//Houses near metro and are between 400 and 500
+var houses45= new L.GeoJSON.AJAX(schoolDistrictHouses,
+{onEachFeature: popupBrown,
+filter: function(feature, layer){return feature.properties.ListPrice > 400000  && feature.properties.ListPrice < 500000;}
+});
+
+//Houses near metro and are between 500 and 600
+var houses56= new L.GeoJSON.AJAX(schoolDistrictHouses,
+{onEachFeature: popupRed,
+filter: function(feature, layer){return feature.properties.ListPrice > 500000  && feature.properties.ListPrice < 600000;}
+});
+
+
+//** Start of Services **//
+//School Districts URL Geoserver
+var url = "/geoserver/high_schools/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=high_schools:high_school&maxFeatures=50&outputFormat=application%2Fjson";
+
+// School Districts
+var url1 = "https://rawgit.com/pq1/772-Final/master/cluster.geojson";
+// load GeoJSON from an external file
+var schoolDistricts = new L.GeoJSON.AJAX(url1 ,
+{onEachFeature: schoolPop,
+style: schoolColor});
+
+//High Schools Location
+//JSON Layer of High School Locations
+var url = "https://data.montgomerycountymd.gov/resource/7ycz-azby.json";
+
+
+// LayerJSON to pull in JSON Link
+var highSchoolJSON = new L.LayerJSON({ url: url, propertyLoc: ['latitude','longitude'], buildPopup: function(data, marker){
+    return data.school_name;}
+});
+
+// ESRI Zip Code Service
+var zipCode = L.esri.dynamicMapLayer({ url: 'https://gis3.montgomerycountymd.gov/arcgis/rest/services/general/zipcode/MapServer', opacity: 0.5
+});
+   // Zip Code Popup
+zipCode.bindPopup(function (error, featureCollection) {
+if (error || featureCollection.features.length === 0) {return false; } else {return 'Zipcode: ' + featureCollection.features[0].properties.ZIPCODE;}
+});
+
+//** End of Services **//
+
+// Start of Interface //
+// Adding Layers Interface
+var basemaps = {
+"ESRI Grayscale" : esriGray,
+"Open Street Map": OpenStreetMap,
+};
+
+var overlayMaps = {
+"$300 - $400": houses34,
+"$400 - $500": houses45,
+"$500 - $600": houses56,
+"School Districts": schoolDistricts,
+"High Schools" : highSchoolJSON,
+"Zip Codes" : zipCode,
+};
+
+// Add Layer Control //
+L.control.layers(basemaps,overlayMaps).addTo(map);
+
+// Add in Legend for School Districts
+var legend = L.control({position: 'bottomleft'});legend.onAdd = function (map) {
+var div = L.DomUtil.create('div', 'info legend'), 
+    grades = [5, 6, 7, 8, 9, 10],
+    labels = [],
+    from;
+	for (var i = 0; i < grades.length; i++) {
+    from = grades[i];
+    labels.push('<i style="background:' + getColor(from + 1) + '"></i> ' + from);}
+	div.innerHTML = 'School Ratings'+ '<br>' + labels.join('<br>');
+    return div;};
+legend.addTo(map);
+
+// End Layers Interface //    
+</script>
+</body>
+</html>
