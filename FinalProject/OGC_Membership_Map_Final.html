@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>OGC Membership Map</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+		<link rel="stylesheet" type="text/css" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+		<link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.css" />
+		<link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.Default.css" />
+
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
+		<script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA==" crossorigin=""></script>
+
+		<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js'></script>
+    <script type='text/javascript' src='http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js'></script>
+    <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/leaflet.markercluster.js'></script>
+
+
+
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		#map {
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+
+
+</head>
+<body>
+
+<div id='map'></div>
+
+
+
+
+<script>
+
+/* WFS request using jquery ajax (Includes facet filtering, styling, and clustering) */
+
+			var rootUrl = 'http://3.121.239.194:8090/geoserver/GES772/ows';
+
+			var defaultParameters = {
+			    service: 'WFS',
+			    version: '1.0.0',
+			    request: 'GetFeature',
+			    typeName: 'GES772:Members',
+			    outputFormat: 'text/javascript',
+			    format_options: 'callback: getJson'
+
+			};
+
+			var parameters = L.Util.extend(defaultParameters);
+
+
+			$.ajax({
+			    url: rootUrl + L.Util.getParamString(parameters),
+			    dataType: 'jsonp',
+			    jsonpCallback: 'getJson',
+			    success: handleJson
+			});
+
+			var full = new L.featureGroup();
+			var lgovfs = new L.featureGroup();
+			var lgovf = new L.featureGroup();
+			var lgovs = new L.featureGroup();
+			var lgovl = new L.featureGroup();
+			var luni = new L.featureGroup();
+			var ltech = new L.featureGroup();
+			var lassoc = new L.featureGroup();
+			var lstrat = new L.featureGroup();
+			var lprin = new L.featureGroup();
+			var ltechagg = new L.featureGroup();
+			var lsmallcomp = new L.featureGroup();
+			var lind = new L.featureGroup();
+			var lother = new L.featureGroup();
+			var ogovi = new L.featureGroup();
+			var ogovn = new L.featureGroup();
+			var ogovs = new L.featureGroup();
+			var ogovl = new L.featureGroup();
+			var ouni = new L.featureGroup();
+			var ori = new L.featureGroup();
+			var ocom = new L.featureGroup();
+			var oind = new L.featureGroup();
+			var oother = new L.featureGroup();
+
+
+			var fullwfs;
+			var lgovfswfs;
+			var lgovfwfs;
+			var lgovswfs;
+			var lgovlwfs;
+			var luniwfs;
+			var ltechwfs;
+			var lassocwfs;
+			var lstratwfs;
+			var lprinwfs;
+			var ltechaggwfs;
+			var lsmallcompwfs;
+			var lindwfs;
+			var lotherwfs;
+			var ogoviwfs;
+			var ogovnwfs;
+			var ogovswfs;
+			var ogovlwfs;
+			var ouniwfs;
+			var oriwfs;
+			var ocomwfs;
+			var oindwfs;
+			var ootherwfs;
+
+
+			function handleJson(data) {
+					wfsLayer = data;
+
+					fullwfs = L.geoJson(wfsLayer, { onEachFeature: onEachFeature, pointToLayer: pointToLayer }).addTo(markerClusters1.addTo(full));
+					lgovfswfs = L.geoJson(wfsLayer, { filter: lgovfsFilter, onEachFeature: onEachFeature, pointToLayer: pointToLayer }).addTo(markerClustersl1.addTo(lgovfs));
+					lgovfwfs = L.geoJson(wfsLayer, { filter: lgovfFilter, onEachFeature: onEachFeature, pointToLayer: pointToLayer }).addTo(markerClustersl2.addTo(lgovf));
+					lgovswfs = L.geoJson (wfsLayer, {filter:lgovsFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClustersl3.addTo(lgovs));
+					lgovlwfs = L.geoJson (wfsLayer, {filter:lgovlFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClustersl4.addTo(lgovl));
+					luniwfs = L.geoJson (wfsLayer, {filter:luniFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClustersl5.addTo(luni));
+					ltechwfs = L.geoJson (wfsLayer, {filter:ltechFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClustersl6.addTo(ltech));
+					lassocwfs = L.geoJson (wfsLayer, {filter:lassocFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClustersl7.addTo(lassoc));
+					lstratwfs = L.geoJson (wfsLayer, {filter:lstratFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClustersl8.addTo(lstrat));
+					lprinwfs = L.geoJson (wfsLayer, {filter:lprinFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClustersl9.addTo(lprin));
+					ltechaggwfs = L.geoJson (wfsLayer, {filter:ltechaggFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClustersl10.addTo(ltechagg));
+					lsmallcompwfs = L.geoJson (wfsLayer, {filter:lsmallcompFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClustersl11.addTo(lsmallcomp));
+					lindwfs = L.geoJson (wfsLayer, {filter:lindFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClustersl12.addTo(lind));
+					lotherwfs = L.geoJson (wfsLayer, {filter:lotherFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClustersl13.addTo(lother));
+					ogoviwfs = L.geoJson (wfsLayer, {filter:ogoviFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClusterso1.addTo(ogovi));
+					ogovnwfs = L.geoJson (wfsLayer, {filter:ogovnFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClusterso2.addTo(ogovn));
+					ogovswfs = L.geoJson (wfsLayer, {filter:ogovsFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClusterso3.addTo(ogovs));
+					ogovlwfs = L.geoJson (wfsLayer, {filter:ogovlFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClusterso4.addTo(ogovl));
+					ouniwfs = L.geoJson (wfsLayer, {filter:ouniFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClusterso5.addTo(ouni));
+					oriwfs = L.geoJson (wfsLayer, {filter:oriFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClusterso6.addTo(ori));
+					ocomwfs = L.geoJson (wfsLayer, {filter:ocomFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClusterso7.addTo(ocom));
+					oindwfs = L.geoJson (wfsLayer, {filter:oindFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClusterso8.addTo(oind));
+					ootherwfs = L.geoJson (wfsLayer, {filter:ootherFilter,onEachFeature: onEachFeature,pointToLayer: pointToLayer}).addTo(markerClusterso9.addTo(oother));
+
+			}
+
+
+
+			var defaultParameters2 = {
+					service: 'WFS',
+					version: '1.0.0',
+					request: 'GetFeature',
+					typeName: 'GES772:CountryScore',
+					maxFeatures: '3',
+					filter: '<Filter><PropertyIsGreaterThan><PropertyName>CountryG_1</PropertyName><Literal>35</Literal></PropertyIsGreaterThan></Filter>',
+					outputFormat: 'text/javascript',
+					format_options: 'callback: getJson2'
+
+			};
+
+			var parameters2 = L.Util.extend(defaultParameters2);
+
+			$.ajax({
+					url: rootUrl + L.Util.getParamString(parameters2),
+					dataType: 'jsonp',
+					jsonpCallback: 'getJson2',
+					success: handleJson2
+			});
+
+			var cscore = new L.featureGroup();
+			var countries;
+			function handleJson2(data) {
+					countwfs = data;
+
+					countries = L.geoJson(countwfs, {
+
+						onEachFeature: onEachFeature2,
+						style: stylePoly
+
+							}
+					).addTo(cscore);
+			}
+
+
+
+/* WMS Basemap Layers */
+
+			var wmsLayer = L.tileLayer.wms('https://demo.boundlessgeo.com/geoserver/ows?', {
+			    layers: 'ne:ne'
+			});
+
+
+			var wmsLayer2 = L.tileLayer.wms('https://demo.boundlessgeo.com/geoserver/ows?', {
+			    layers: 'nasa:bluemarble'
+			});
+
+
+
+
+/* Basemap grouping for layer control/legend */
+
+			var baseLayers = {
+					"Basemap": wmsLayer,
+					"Aerial": wmsLayer2
+			};
+
+
+
+
+/* Initiate map, define initial center point and zoom level */
+
+			var map = L.map('map', {
+					center: [0, 0],
+					zoom: 3,
+					layers: [wmsLayer]
+				});
+
+
+
+
+/* Popup and style function */
+
+			function onEachFeature(feature, layer) {
+				var popupContent = "<p><b>Name: </b>" +
+						feature.properties.Name + "<br/><b>Org Type: </b>" +
+						feature.properties.OrgType + "<br/><b>Level: </b>" +
+						feature.properties.Level + "</p>";
+
+				layer.bindPopup(popupContent);
+			}
+
+
+
+			function onEachFeature2(feature, layer) {
+				var popupContent2 = "<p><b>Name: </b>" +
+						feature.properties.CountryGIS + "<br/><b>Score: </b>" +
+						feature.properties.CountryG_1;
+
+				layer.bindPopup(popupContent2);
+			}
+
+
+
+			var stylePoly = {
+						fillColor: "#61002d",
+						color: "#000",
+						weight: 1,
+						opacity: 1,
+						fillOpacity: 0.8
+			};
+
+
+
+			var stylePoint = {
+						radius: 4,
+						fillColor: "#0058ff",
+						color: "#000",
+						weight: 1,
+						opacity: 1,
+						fillOpacity: 0.8
+			};
+
+			function pointToLayer (feature, latlng) {
+				return L.circleMarker(latlng, stylePoint);
+			}
+
+
+
+
+/* Filter functions for each facet */
+
+			function luniFilter (feature){ if (feature.properties.Level === 'University') return true; }
+			function lgovfsFilter (feature){ if (feature.properties.Level === 'GovFuture-Subnational') return true; }
+			function lgovfFilter (feature){ if (feature.properties.Level === 'GovFuture-Local') return true; }
+			function ltechFilter (feature){ if (feature.properties.Level === 'Technical') return true; }
+			function lassocFilter (feature){ if (feature.properties.Level === 'Associate') return true; }
+			function lotherFilter (feature){ if (feature.properties.Level === 'NGO') return true; }
+			function lstratFilter (feature){ if (feature.properties.Level === 'Strategic') return true; }
+			function lprinFilter (feature){ if (feature.properties.Level === 'Principal') return true; }
+			function ltechaggFilter (feature){ if (feature.properties.Level === 'Technical Aggregate') return true; }
+			function lsmallcompFilter (feature){ if (feature.properties.Level === 'Small Company') return true; }
+			function lgovsFilter (feature){ if (feature.properties.Level === 'Government-Subnational') return true; }
+			function lgovlFilter (feature){ if (feature.properties.Level === 'Government-Local') return true; }
+			function lindFilter (feature){ if (feature.properties.Level === 'Individual') return true; }
+			function ouniFilter (feature){ if (feature.properties.OrgType === 'University') return true; }
+			function oriFilter (feature){ if (feature.properties.OrgType === 'Research Institution') return true; }
+			function ogovnFilter (feature){ if (feature.properties.OrgType === 'Government-National') return true; }
+			function ocomFilter (feature){ if (feature.properties.OrgType === 'Commercial') return true; }
+			function ogovlFilter (feature){ if (feature.properties.OrgType === 'Government-Local') return true; }
+			function ogovsFilter (feature){ if (feature.properties.OrgType === 'Government-Subnational') return true; }
+			function ogoviFilter (feature){ if (feature.properties.OrgType === 'Government-International') return true; }
+			function oindFilter (feature){ if (feature.properties.OrgType === 'Individual') return true; }
+			function ootherFilter (feature){ if (feature.properties.OrgType === 'NGO') return true; }
+
+
+
+
+
+/* Cluster settings and marker cluster grouping */
+
+			var clusterSettings = {
+					maxClusterRadius : 50,
+					};
+
+
+			var markerClusters1 = L.markerClusterGroup(clusterSettings);
+			var markerClustersl1 = L.markerClusterGroup(clusterSettings);
+			var markerClustersl2 = L.markerClusterGroup(clusterSettings);
+			var markerClustersl3 = L.markerClusterGroup(clusterSettings);
+			var markerClustersl4 = L.markerClusterGroup(clusterSettings);
+			var markerClustersl5 = L.markerClusterGroup(clusterSettings);
+			var markerClustersl6 = L.markerClusterGroup(clusterSettings);
+			var markerClustersl7 = L.markerClusterGroup(clusterSettings);
+			var markerClustersl8 = L.markerClusterGroup(clusterSettings);
+			var markerClustersl9 = L.markerClusterGroup(clusterSettings);
+			var markerClustersl10 = L.markerClusterGroup(clusterSettings);
+			var markerClustersl11 = L.markerClusterGroup(clusterSettings);
+			var markerClustersl12 = L.markerClusterGroup(clusterSettings);
+			var markerClustersl13 = L.markerClusterGroup(clusterSettings);
+			var markerClusterso1 = L.markerClusterGroup(clusterSettings);
+			var markerClusterso2 = L.markerClusterGroup(clusterSettings);
+			var markerClusterso3 = L.markerClusterGroup(clusterSettings);
+			var markerClusterso4 = L.markerClusterGroup(clusterSettings);
+			var markerClusterso5 = L.markerClusterGroup(clusterSettings);
+			var markerClusterso6 = L.markerClusterGroup(clusterSettings);
+			var markerClusterso7 = L.markerClusterGroup(clusterSettings);
+			var markerClusterso8 = L.markerClusterGroup(clusterSettings);
+			var markerClusterso9 = L.markerClusterGroup(clusterSettings);
+
+
+
+
+/* All overlays (non-basemap layers) that will appear in the layer control interface must appear together in a variable */
+
+
+			var overlays = {
+						"Geospatial Readiness Score" : cscore,
+						"All OGC Members" : full,
+						"Level: GovFuture-Subnational" : lgovfs,
+						"Level: GovFuture-Local" : lgovf,
+						"Level: Government-Subnational" : lgovs,
+						"Level: Government-Local" : lgovl,
+						"Level: Associate" : lassoc,
+						"Level: Technical" : ltech,
+						"Level: University" : luni,
+						"Level: Individual" : lind,
+						"Level: Strategic" : lstrat,
+						"Level: Principal" : lprin,
+						"Level: Technical Aggregate" : ltechagg,
+						"Level: Small Company" : lsmallcomp,
+						"Level: NGO" : lother,
+						"Org Type: Government-International" : ogovi,
+						"Org Type: Government-National" : ogovn,
+						"Org Type: Government-Subnational" : ogovs,
+						"Org Type: Government-Local" : ogovl,
+						"Org Type: Commercial" : ocom,
+						"Org Type: Individual" : oind,
+						"Org Type: University" : ouni,
+						"Org Type: Research Institution" : ori,
+						"Org Type: NGO" : oother
+			};
+
+
+
+/* Adds Layer Control interface to the map */
+
+			var layerControl = L.control.layers(baseLayers, overlays, {collapsed : false, position : 'topright'});
+			map.addControl(layerControl);
+
+
+
+
+/* Creates popup layer and adds an on click function for position to it */
+
+			var popup = L.popup();
+
+
+			function onMapClick(e) {
+			    popup
+			        .setLatLng(e.latlng)
+			        .setContent("You clicked the map at " + e.latlng.toString())
+			        .openOn(map);
+			}
+
+			map.on('click', onMapClick);
+
+</script>
+
+
+
+</body>
+</html>
