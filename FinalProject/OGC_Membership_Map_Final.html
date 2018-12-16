@@ -154,8 +154,8 @@
 					version: '1.0.0',
 					request: 'GetFeature',
 					typeName: 'GES772:CountryScore',
-					maxFeatures: '3',
-					filter: '<Filter><PropertyIsGreaterThan><PropertyName>CountryG_1</PropertyName><Literal>35</Literal></PropertyIsGreaterThan></Filter>',
+					maxFeatures: '50',
+//					filter: '<Filter><PropertyIsGreaterThan><PropertyName>CountryG_1</PropertyName><Literal>35</Literal></PropertyIsGreaterThan></Filter>',
 					outputFormat: 'text/javascript',
 					format_options: 'callback: getJson2'
 
@@ -235,13 +235,13 @@
 
 
 			function onEachFeature2(feature, layer) {
-				var popupContent2 = "<p><b>Name: </b>" +
-						feature.properties.CountryGIS + "<br/><b>Score: </b>" +
-						feature.properties.CountryG_1;
+				var popupContent2 = "<p><b>Country: </b>" +
+						feature.properties.Country + "<br/><b>Score: </b>" +
+						feature.properties.Score + "<br/><b>Level: </b>" +
+						feature.properties.Level;
 
 				layer.bindPopup(popupContent2);
 			}
-
 
 
 			var stylePoly = {
